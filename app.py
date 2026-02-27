@@ -68,7 +68,7 @@ class Storyboard(BaseModel):
 
 # UTILITY FUNCTIONS
 def sanitize_session_name(name: str) -> str:
-    """FIX #4: Sanitize session name to prevent path traversal in Supabase storage paths."""
+    """ Sanitize session name to prevent path traversal in Supabase storage paths."""
     sanitized = re.sub(r'[^a-zA-Z0-9_\-]', '_', name)
     if not sanitized:
         sanitized = "default_session"
@@ -125,7 +125,7 @@ def stitch_and_upload(video_urls: List[str], session_id: str) -> str:
         for i, url in enumerate(video_urls):
             filename = os.path.join(tmpdir, f"stitch_temp_{i}.mp4")
             print(f" Downloading segment {i+1}...")
-            response = requests.get(url)
+            response = requests.get(url, timeout=60)
             if response.status_code == 200:
                 with open(filename, 'wb') as f:
                     f.write(response.content)
@@ -191,7 +191,8 @@ def script_writer_node(state: VideoState):
     result = structured_llm.invoke(sys_prompt)
     formatted_scenes = [{"p": scene.prompt} for scene in result.scenes[:8]]
 
-    print(f"\n Gemini successfully created {len(formatted_scenes)} distinct scenes!")
+    if len(result.scenes) < 8:
+        print(f"Warning: Gemini only returned {len(result.scenes)} scenes instead of 8.")
     print("\n 40-SECOND STORYBOARD ")
     for i, scene in enumerate(formatted_scenes):
         start_time = i * 5
@@ -202,7 +203,7 @@ def script_writer_node(state: VideoState):
     # HITL APPROVAL
     approval = input(
         " HUMAN REVIEW: Do you approve this storyboard for generation? "
-        "Type 'y' to proceed (Estimated API Cost: ~$3.20) or 'n' to abort: "
+        "Type 'y' to proceed or 'n' to abort: "
     ).strip().lower()
 
     if approval != 'y':
@@ -253,7 +254,7 @@ def generation_node(state: VideoState):
 
     try:
         with open(local_video_path, 'wb') as f:
-            f.write(requests.get(fal_video_url).content)
+            f.write(requests.get(fal_video_url, timeout=60).content)
 
         last_frame_url, clip_url = process_and_upload(local_video_path, state["session_id"], idx)
         print(f" Segment {idx+1} synced to Supabase!\n")
