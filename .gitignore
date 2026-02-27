@@ -1,0 +1,10 @@
+# Environments
+.env
+__pycache__/
+*.pyc
+
+# Ignored Outputs 
+*.mp4
+*.jpg
+*.png
+concat_list.txt
