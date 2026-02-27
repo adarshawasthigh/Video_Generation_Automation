@@ -36,12 +36,20 @@ This pipeline integrates deterministic orchestration with probabilistic AI model
 ```bash
 git clone [https://github.com/yourusername/Video_Generation_Automation.git](https://github.com/yourusername/Video_Generation_Automation.git)
 cd Video_Generation_Automation
-
+```
+**2.Install dependencies:**
+```bash
 pip install -r requirements.txt
-
+```
+**3.Configure Environment Variables:**
+```bash
 GEMINI_API_KEY=your_google_key
 FAL_KEY=your_fal_ai_key
 SUPABASE_URL=your_supabase_project_url
 SUPABASE_KEY=your_supabase_service_role_key
-
+```
+**4.Execute the Agent:**
+```bash
 python app.py
+```
+
